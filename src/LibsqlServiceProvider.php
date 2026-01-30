@@ -40,12 +40,15 @@ class LibsqlServiceProvider extends PackageServiceProvider
         });
 
         $this->app->scoped(LibsqlManager::class, function ($app) {
-            return new LibsqlManager(config('database.connections.libsql'));
+            // return new LibsqlManager(config('database.connections.libsql'));
+            $defaultConnection = config('database.default');
+            $connectionConfig = config("database.connections.{$defaultConnection}");
+            return new LibsqlManager($connectionConfig ?: []);
         });
 
         $this->app->resolving('db', function (DatabaseManager $db) {
             $db->extend('libsql', function ($config, $name) {
-                $config = config('database.connections.libsql');
+                // $config = config('database.connections.libsql');
                 $config['name'] = $name;
                 if (!isset($config['driver'])) {
                     $config['driver'] = 'libsql';
